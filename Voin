@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marz Pedia - Enhanced</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <script>
+      tailwind.config = {
+          darkMode: 'class',
+          theme: {
+              extend: {
+                  fontFamily: {
+                      sans: ['Inter', 'sans-serif'],
+                      heading: ['Space Grotesk', 'sans-serif'],
+                  },
+                  colors: {
+                      primary: {
+                          DEFAULT: '#06b6d4',
+                          foreground: '#ffffff',
+                      },
+                      secondary: {
+                          DEFAULT: '#f1f5f9',
+                          foreground: '#0f172a',
+                      },
+                      card: {
+                          DEFAULT: '#ffffff',
+                          foreground: '#0f172a',
+                      },
+                      destructive: {
+                          DEFAULT: '#ef4444',
+                          foreground: '#ffffff',
+                      }
+                  }
+              }
+          }
+      }
+  </script>
+
+  <style>
+      :root { --bg-start: #e0f7fa; --bg-mid:#b2ebf2; --bg-end:#80deea; }
+      html { scroll-behavior: smooth; }
+      body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-mid) 50%, var(--bg-end) 100%);
+          color: #0f172a;
+      }
+      .dark body { background: linear-gradient(135deg,#071827 0%,#042f36 50%,#06363a 100%); color:#e6eef0 }
+      h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid rgba(226, 232, 240, 0.6); }
+      .dark .glass { background: rgba(6, 11, 13, 0.55); border-bottom-color: rgba(255,255,255,0.06); }
+
+      .slider-container {
+          width: 100%;
+          max-width: 1200px;
+          margin: 120px auto 20px auto;
+          position: relative;
+      }
+      .slider-img {
+          width: 100%;
+          height: 70vh;
+          min-height: 320px;
+          object-fit: cover;
+          border-radius: 0;
+          display: block;
+          transition: opacity 0.3s ease-in-out;
+          opacity: 1;
+      }
+      .slider-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.45);
+        color: #fff;
+        border: none;
+        font-size: 24px;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        z-index: 30;
+      }
+      .slider-btn.left { left: 10px; }
+      .slider-btn.right { right: 10px; }
+
+      /* Overlay and indicators */
+      .slider-hero { position: relative; overflow: hidden; border-radius: 12px; }
+      .slider-overlay { position: absolute; left: 0; right: 0; bottom: 18%; padding: 28px; color: black; text-shadow: 0 2px 8px rgba(255,255,255,0.6); z-index: 20; }
+      .slider-overlay h2 { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; margin: 0 0 8px 0; color: black; }
+      .slider-dots { position: absolute; left: 50%; transform: translateX(-50%); bottom: 8px; display:flex; gap:8px; z-index: 30; }
+      .slider-dot { width:10px; height:10px; border-radius:999px; background: rgba(255,255,255,0.6); cursor:pointer; transition:all .2s; }
+      .slider-dot.active { width:32px; background: linear-gradient(90deg,#06b6d4,#14b8a6); }
+
+      /* Toast */
+      #toast { transform: translateY(24px) scale(.98); opacity:0; }
+      #toast.show { transform: translateY(0) scale(1); opacity:1; }
+
+      /* Cart badge pop */
+      @keyframes pop { 0%{transform:scale(.9)}50%{transform:scale(1.25)}100%{transform:scale(1)} }
+      .pop { animation: pop .45s ease; }
+
+      /* Product card polish */
+      .product-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all .35s cubic-bezier(.34,.1,.64,1);
+        border: 1.5px solid #f0f4f8;
+        box-shadow: 0 4px 12px rgba(6,182,212,.08), 0 2px 4px rgba(0,0,0,.02);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .dark .product-card {
+        background: #1a1a1a;
+        border-color: #2a2a2a;
+      }
+      .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px rgba(6,182,212,.15), 0 8px 16px rgba(0,0,0,.06);
+        border-color: #d4f1f9;
+      }
+      .dark .product-card:hover {
+        border-color: #06b6d4;
+      }
+      .product-badge { position:absolute; left:12px; top:12px; padding:8px 12px; border-radius:999px; font-size:11px; font-weight:800; color:white; box-shadow:0 8px 20px rgba(0,0,0,.2); text-transform: uppercase; letter-spacing:.5px; }
+      .product-rating-top { position:absolute; right:12px; top:12px; z-index:10; }
+      .badge-hot { background:linear-gradient(135deg,#f97316,#ef4444); }
+      .badge-limited { background:linear-gradient(135deg,#f59e0b,#f97316); }
+      .card-img-wrap { position:relative; overflow:hidden; background:linear-gradient(135deg,#f0f4f8,#e8f3f5); }
+      .dark .card-img-wrap { background:linear-gradient(135deg,#2a2a2a,#1a1a1a); }
+      .card-img-wrap img { transition: transform .7s cubic-bezier(.16,.84,.44,1); }
+      .product-card:hover .card-img-wrap img { transform: scale(1.12) rotate(-2deg); }
+      .product-info { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+      .product-category { font-size:11px; font-weight:700; color:#0891b2; text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; }
+      .dark .product-category { color:#06b6d4; }
+      .product-title { font-family: 'Space Grotesk'; font-weight:600; font-size:1rem; line-height:1.4; margin-bottom:8px; color:#0f172a; }
+      .dark .product-title { color:#e6eef0; }
+      .product-footer { margin-top: auto; display:flex; justify-content:space-between; align-items:center; }
+      .product-price { font-size:1.125rem; font-weight:700; color:#06b6d4; }
+      .product-sold { font-size:11px; color:#94a3b8; font-weight:500; }
+
+      /* Smooth reveal for sections */
+      .reveal { opacity:0; transform: translateY(10px); transition: all .6s cubic-bezier(.2,.9,.2,1); }
+      .reveal.show { opacity:1; transform:none; }
+
+      /* Button press animation */
+      button {
+          transition: transform 0.1s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+      }
+      button:active {
+          transform: scale(0.95);
+      }
+
+      /* small responsive tweaks */
+      @media (max-width: 768px) {
+        .slider-overlay h2 { font-size:1.4rem; }
+        .slider-overlay { bottom:12%; padding:18px; }
+      }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="fixed top-0 w-full z-50 glass">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold font-heading text-primary tracking-tight" onclick="renderHome()">
+                Marz<span class="text-slate-900 dark:text-slate-100">Pedia</span>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md relative">
+                <i class="ph ph-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Cari produk..."
+                    class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    oninput="renderProducts()">
+            </div>
+
+            <!-- Navigation Menu & Actions -->
+            <div class="flex items-center gap-3">
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex gap-4">
+                    <button onclick="renderHome()" class="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        Beranda
+                    </button>
+                    <button onclick="renderHome(); setTimeout(() => document.getElementById('productGrid').scrollIntoView({behavior:'smooth'}), 100)" class="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        Produk
+                    </button>
+                    <button onclick="renderAbout()" class="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        Tentang Kami
+                    </button>
+                    <button onclick="renderContact()" class="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        Kontak Kami
+                    </button>
+                    <button onclick="openEventModal()" class="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        Event
+                    </button>
+                </nav>
+
+                <!-- Cart Button -->
+                <button onclick="openDrawer()" class="relative p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <i class="ph ph-shopping-cart text-2xl text-slate-700 dark:text-slate-300"></i>
+                    <span id="cartBadge" class="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+                </button>
+
+                <!-- User Account -->
+                <div id="authArea">
+                    <!-- Injected by JS -->
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <button id="darkToggle" onclick="toggleDark()" class="ml-2 p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden md:inline-flex" title="Toggle dark mode">
+                    <i class="ph ph-circle-half-tilt text-slate-600 dark:text-slate-400"></i>
+                </button>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <i class="ph ph-list text-2xl text-slate-700 dark:text-slate-300"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-slate-800 border-t dark:border-slate-700">
+            <div class="container mx-auto px-4 py-4 space-y-2">
+                <button onclick="renderHome(); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    Beranda
+                </button>
+                <button onclick="renderProducts(); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    Produk
+                </button>
+                <button onclick="renderAbout(); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    Tentang Kami
+                </button>
+                <button onclick="renderContact(); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    Kontak Kami
+                </button>
+                <button onclick="openEventModal(); toggleMobileMenu()" class="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    Event
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SLIDER SECTION -->
+    <section class="slider-container slider-hero" id="sliderContainer">
+        <button class="slider-btn left" onclick="prevSlide()" aria-label="Previous slide">&#8592;</button>
+        <div class="card-img-wrap">
+            <img id="slider" class="slider-img" src="https://picsum.photos/id/1015/1200/600" alt="Gambar Slider">
+        </div>
+        <button class="slider-btn right" onclick="nextSlide()" aria-label="Next slide">&#8594;</button>
+
+        <div class="slider-overlay">
+            <h2 id="sliderTitle">Promo Spesial</h2>
+            <p id="sliderDesc" class="text-sm max-w-xl">Temukan penawaran terbaik untuk produk pilihan setiap hari. Yuk belanja sekarang!</p>
+            <div class="mt-4">
+                <button onclick="document.getElementById('productGrid').scrollIntoView({behavior:'smooth'})" class="px-5 py-2 bg-white text-teal-600 font-bold rounded-full hover:bg-slate-100 transition-colors">
+                    Belanja Sekarang
+                </button>
+            </div>
+        </div>
+
+        <div class="slider-dots" id="sliderDots" aria-hidden="false"></div>
+    </section>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="app" class="container mx-auto px-4 pt-24 pb-12 flex-1">
+        <!-- Views will be injected here -->
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-slate-900 border-t dark:border-slate-800 py-12 mt-auto">
+        <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-3 gap-8 mb-8">
+            <!-- Company Info -->
+            <div>
+                <h3 class="text-primary font-bold text-xl mb-4">Marz Pedia</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                    Toko online terpercaya untuk semua kebutuhan Anda. Kami menyediakan produk berkualitas dengan harga terbaik.
+                </p>
+                <div class="flex gap-4">
+                    <a href="https://facebook.com/marzpedia" title="Facebook" class="hover:text-primary text-xl transition-colors"><i class="ph ph-facebook-logo"></i></a>
+                    <a href="https://instagram.com/marzpedia" title="Instagram" class="hover:text-primary text-xl transition-colors"><i class="ph ph-instagram-logo"></i></a>
+                    <a href="https://twitter.com/marzpedia" title="Twitter" class="hover:text-primary text-xl transition-colors"><i class="ph ph-x-logo"></i></a>
+                    <a href="https://wa.me/085784819599" title="WhatsApp" class="hover:text-primary text-xl transition-colors"><i class="ph ph-whatsapp-logo"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-4">Tautan Cepat</h4>
+                <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                    <li><a href="#" onclick="renderHome()" class="hover:text-primary transition-colors">Beranda</a></li>
+                    <li><a href="#" onclick="renderProducts()" class="hover:text-primary transition-colors">Produk</a></li>
+                    <li><a href="#" onclick="renderAbout()" class="hover:text-primary transition-colors">Tentang Kami</a></li>
+                    <li><a href="#" onclick="renderContact()" class="hover:text-primary transition-colors">Kontak Kami</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div>
+                <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-4">Kontak Kami</h4>
+                <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                    <li class="flex items-center gap-2">
+                        <i class="ph ph-map-pin text-primary"></i>
+                        <span>Jl. Kol H Ismail No. 2, Jombang</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i class="ph ph-phone text-primary"></i>
+                        <span>+62 8578-4819-599</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i class="ph ph-envelope text-primary"></i>
+                        <span>marzpedia@gmail.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-slate-500 text-sm">&copy; 2025 Marz Pedia. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0 text-sm text-slate-500">
+                    <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
+                    <a href="#" class="hover:text-primary transition-colors">Syarat & Ketentuan</a>
+                    <a href="#" class="hover:text-primary transition-colors">Pengiriman</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CART DRAWER (Overlay) -->
+    <div id="cartDrawer" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeDrawer()"></div>
+        <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-300 translate-x-full dark:bg-slate-900" id="drawerContent">
+            <div class="p-4 border-b flex justify-between items-center dark:border-slate-700">
+                <h2 class="text-xl font-bold font-heading dark:text-slate-100">Your Cart</h2>
+                <button onclick="closeDrawer()" class="p-2 hover:bg-slate-100 rounded-full dark:hover:bg-slate-800"><i class="ph ph-x text-xl dark:text-slate-300"></i></button>
+            </div>
+            <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-4 dark:bg-slate-800">
+                <!-- Cart Items Injected Here -->
+            </div>
+            <div class="p-4 border-t bg-slate-50 dark:bg-slate-800 dark:border-slate-700">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-medium text-slate-600 dark:text-slate-300">Subtotal</span>
+                    <span id="cartSubtotal" class="text-slate-600 dark:text-slate-300">Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center mb-4" id="discountRow" style="display: none;">
+                    <span class="font-medium text-green-600">Diskon (20%)</span>
+                    <span id="cartDiscount" class="text-green-600">-Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="font-medium text-slate-600 dark:text-slate-300">Total</span>
+                    <span id="cartTotal" class="text-2xl font-bold text-primary">Rp 0</span>
+                </div>
+                <button onclick="DB.checkout()" class="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-teal-600 transition-colors shadow-lg shadow-teal-500/20">
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeAuth()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-95 opacity-0" id="authContent">
+            <h2 class="text-2xl font-bold font-heading text-center mb-6">Login</h2>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <input type="text" id="loginUser" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none" placeholder="admin">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="loginPass" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none" placeholder="admin">
+                </div>
+                <button type="submit" class="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">Login</button>
+                <p class="text-xs text-center text-slate-400">Try: admin/admin or user/user</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- EVENT MODAL -->
+    <div id="eventModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeEventModal()"></div>
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-95 opacity-0" id="eventContent">
+            <h2 class="text-2xl font-bold font-heading text-center mb-6 dark:text-slate-100">Mini Game Event</h2>
+            <div id="gameSelection">
+                <div class="space-y-3">
+                    <button onclick="selectGame('number')" class="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">🧠 Tebak Angka</button>
+                    <button onclick="selectGame('rps')" class="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">✂️ Batu Kertas Gunting</button>
+                    <button onclick="selectGame('math')" class="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">🔢 Kuis Matematika</button>
+                    <button onclick="selectGame('riddle')" class="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">🧩 Tebak Tebakan</button>
+                </div>
+            </div>
+            <div id="gameArea" class="hidden">
+                <!-- Game content will be injected here -->
+            </div>
+            <div id="winMessage" class="hidden text-center">
+                <p class="text-green-600 font-bold mb-2">Selamat! Anda menang diskon 20%!</p>
+                <button onclick="closeEventModal()" class="px-4 py-2 bg-primary text-white rounded-lg">Tutup</button>
+            </div>
+            <div id="loseMessage" class="hidden text-center">
+                <p class="text-red-600 font-bold mb-2">Maaf, Anda kalah. Coba lagi lain waktu!</p>
+                <button onclick="closeEventModal()" class="px-4 py-2 bg-primary text-white rounded-lg">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="productModal" class="fixed inset-0 z-[75] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all scale-95 opacity-0" id="productContent">
+            <div class="p-6">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors">
+                    <i class="ph ph-x text-xl dark:text-slate-300"></i>
+                </button>
+
+                <div id="productDetailContent">
+                    <!-- Product details will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-[80]">
+        Item added to cart
+    </div>
+
+    <!-- APPLICATION LOGIC -->
+    <script>
+        // small helpers
+        const uid = () => Math.random().toString(36).slice(2);
+        const formatRupiah = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+        const renderStars = (rating) => {
+            let stars = '';
+            for (let i = 0; i < rating; i++) {
+                stars += '<i class="ph ph-star-fill text-yellow-400 text-sm"></i>';
+            }
+            return stars;
+        };
+
+        // --- DATA STORE ---
+        const DB = {
+            products: [
+                {id:uid(),title:'Kaos Polos Putih',price:50000,cat:'Pakaian',stock:20,img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80',sold:12,rating:4},
+                {id:uid(),title:'Celana Jeans Skinny',price:150000,cat:'Pakaian',stock:15,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDynKYG3rpwfUJiB5mEWe-Ibe8EnU-2bmfTA&s',sold:8,rating:5},
+                {id:uid(),title:'Jaket Hoodie Abu-abu',price:180000,cat:'Pakaian',stock:10,img:'https://dynamic.zacdn.com/dqCpimjRWKjlT0B_fdD2aD3D6OI=/filters:quality(70):format(webp)/https://static-id.zacdn.com/p/little-fresco-0318-3963172-1.jpg',sold:6,rating:4},
+                {id:uid(),title:'Headset Gaming RGB',price:250000,cat:'Elektronik',stock:8,img:'https://images-cdn.ubuy.co.id/68f843f16dc7336ff00f38d2-gaming-headset-gaming-headphones-with.jpg',sold:34,rating:5},
+                {id:uid(),title:'Mouse Gaming Wireless',price:180000,cat:'Elektronik',stock:12,img:'https://images-cdn.ubuy.co.id/67df6e08d291cd779031c7cd-tsv-rgb-gaming-mouse-wired-usb-computer.jpg',sold:22,rating:4},
+                {id:uid(),title:'Keyboard Mekanik RGB',price:350000,cat:'Elektronik',stock:5,img:'https://dorangadget.com/wp-content/uploads/2022/03/Keyboard-Mechanical-Murah-.jpg',sold:18,rating:5},
+                {id:uid(),title:'Kopi',price:25000,cat:'Makanan',stock:50,img:'https://smb-padiumkm-images-public-prod.oss-ap-southeast-5.aliyuncs.com/product/image/21122023/639319630282ec3df8517e5e/658407ff5fbe250a49f9a748/a57e40ea45bff9e1428addee0f9f9b.jpg?x-oss-process=image/resize,m_pad,w_432,h_432/quality,Q_70',sold:54,rating:4},
+                {id:uid(),title:'Teh',price:35000,cat:'Makanan',stock:40,img:'https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/91/MTA-164154420/brd-03342_tong-tji-black-tea-teh-hitam-teh-celup-harga-per-sachet_full01-a834f293.jpg',sold:31,rating:3},
+                {id:uid(),title:'Snack Keripik',price:45000,cat:'Makanan',stock:30,img:'https://awsimages.detik.net.id/community/media/visual/2021/07/24/4-keripik-kentang-rasa-rumput-laut-mana-yang-paling-kriuk-enak.jpeg?w=1200',sold:28,rating:4},
+                {id:uid(),title:'Tas Tangan Wanita',price:250000,cat:'Aksesoris',stock:8,img:'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80',sold:10,rating:5},
+                {id:uid(),title:'Jam Tangan Sport',price:175000,cat:'Aksesoris',stock:14,img:'https://images.tokopedia.net/blog-tokopedia-com/uploads/2019/09/Blog_Pilihan-Jam-Tangan-Outdoor-Terbaik-Tangguh-dan-Canggih.jpg',sold:7,rating:4},
+                {id:uid(),title:'Lampu LED Hias',price:65000,cat:'Elektronik',stock:25,img:'https://siopen.balangankab.go.id/storage/merchant/products/2024/08/01/d3e1be0a75f294fbf7fd7903a0bdc77b.jpg',sold:19,rating:3},
+            ],
+            cart: JSON.parse(localStorage.getItem('tk_cart') || '[]'),
+            session: JSON.parse(localStorage.getItem('tk_session') || 'null'),
+            discount: 0,
+
+            saveCart() { localStorage.setItem('tk_cart', JSON.stringify(this.cart)); renderCartCount(); },
+            saveSession() { localStorage.setItem('tk_session', JSON.stringify(this.session)); renderAuth(); },
+
+            addToCart(id) {
+                const p = this.products.find(x => x.id === id);
+                const exist = this.cart.find(x => x.id === id);
+                if(exist) exist.qty++;
+                else this.cart.push({...p, qty: 1});
+                this.saveCart();
+                // pop animation on badge
+                const b = document.getElementById('cartBadge');
+                b.classList.add('pop');
+                setTimeout(()=> b.classList.remove('pop'), 500);
+                showToast(`Added ${p.title} to cart`);
+            },
+
+            updateQty(id, delta) {
+                const item = this.cart.find(x => x.id === id);
+                if(item) {
+                    item.qty += delta;
+                    if(item.qty <= 0) this.cart = this.cart.filter(x => x.id !== id);
+                    this.saveCart();
+                    renderCartDrawer();
+                }
+            },
+
+            checkout() {
+                if(!this.session) { alert('Please login first!'); return; }
+                alert('Checkout Successful! (Simulation)');
+                this.cart = [];
+                this.saveCart();
+                closeDrawer();
+            },
+
+            login(username, password) {
+                if(username === 'admin' && password === 'admin') {
+                    this.session = { name: 'Administrator', role: 'admin' };
+                    this.saveSession();
+                    return true;
+                }
+                if(username === 'user' && password === 'user') {
+                    this.session = { name: 'Customer', role: 'customer' };
+                    this.saveSession();
+                    return true;
+                }
+                return false;
+            },
+
+            logout() {
+                this.session = null;
+                this.saveSession();
+                if(window.location.hash === '#admin') window.location.hash = '';
+            }
+        };
+
+        const app = document.getElementById('app');
+        const drawer = document.getElementById('cartDrawer');
+        const drawerContent = document.getElementById('drawerContent');
+
+        // Dark mode handling
+        function setDark(enabled) {
+          const root = document.documentElement;
+          if(enabled) root.classList.add('dark');
+          else root.classList.remove('dark');
+          localStorage.setItem('tk_dark', enabled ? '1' : '0');
+        }
+        function toggleDark() { setDark(!document.documentElement.classList.contains('dark')); }
+        (function initDark(){ const saved = localStorage.getItem('tk_dark'); if(saved === '1') setDark(true); })();
+
+        function renderHome() {
+            app.innerHTML = `
+                <!-- Promo Banner -->
+                <div class="mb-8 reveal">
+                    <div class="bg-gradient-to-r from-primary to-teal-500 text-white rounded-2xl p-8 md:p-12 shadow-lg">
+                        <h2 class="text-3xl md:text-4xl font-bold font-heading mb-2">Flash Sale!</h2>
+                        <p class="text-lg mb-4 text-teal-100">Dapatkan diskon hingga 50% untuk produk pilihan</p>
+                        <button onclick="document.getElementById('productGrid').scrollIntoView({behavior:'smooth'})" class="bg-white text-primary px-6 py-2 rounded-full font-bold hover:bg-slate-100 transition-colors">
+                            Lihat Penawaran
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Quick Links -->
+                <div class="mb-8 reveal">
+                    <h3 class="text-xl font-bold font-heading mb-4">Kategori</h3>
+                    <div id="categoryLinks" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+                </div>
+
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold font-heading">Semua Produk</h2>
+                        <span class="text-slate-500 text-sm" id="productCount">0 items</span>
+                    </div>
+                    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+                </div>
+            `;
+            renderCategoryLinks();
+            renderProducts();
+            revealOnScroll();
+        }
+
+        function renderCategoryLinks() {
+            const cats = [...new Set(DB.products.map(p => p.cat))];
+            const container = document.getElementById('categoryLinks');
+            if(!container) return;
+            container.innerHTML = cats.map(c => `
+                <button onclick="filterByCategory('${c}')" class="p-4 rounded-xl bg-white dark:bg-slate-800 border dark:border-slate-700 hover:border-primary dark:hover:border-primary hover:shadow-md transition-all text-center">
+                    <div class="text-2xl mb-2">
+                        ${c === 'Pakaian' ? '👕' : c === 'Elektronik' ? '⚡' : c === 'Makanan' ? '🍜' : '🎁'}
+                    </div>
+                    <p class="font-medium text-sm dark:text-slate-200">${c}</p>
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(category) {
+            // Filter by selected category
+            document.getElementById('searchInput').value = '';
+            renderProducts(category);
+            // Scroll to products
+            document.getElementById('productGrid').scrollIntoView({behavior: 'smooth'});
+        }
+
+        function renderProducts(categoryFilter) {
+            const grid = document.getElementById('productGrid');
+            if(!grid) return;
+
+            const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            
+            const filtered = DB.products.filter(p => {
+                const matchSearch = p.title.toLowerCase().includes(search);
+                const matchCat = !categoryFilter || p.cat === categoryFilter;
+                return matchSearch && matchCat;
+            });
+
+            document.getElementById('productCount').innerText = `${filtered.length} items`;
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">No products found.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((p,idx) => `
+                <div class="group product-card cursor-pointer" onclick="openProductModal('${p.id}')">
+                    ${p.sold > 20 ? `<div class="product-badge badge-hot">⚡ HOT</div>` : (p.stock < 10 ? `<div class="product-badge badge-limited">📦 LIMITED</div>` : '')}
+                    <div class="product-rating-top">${renderStars(p.rating)}</div>
+                    <div class="relative aspect-[4/3] card-img-wrap">
+                        <img src="${p.img}" class="w-full h-full object-cover" alt="${p.title}">
+                        <button onclick="event.stopPropagation(); DB.addToCart('${p.id}')" class="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-xl hover:bg-primary hover:text-white transition-all transform translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 hover:scale-110">
+                            <i class="ph ph-plus text-lg"></i>
+                        </button>
+                    </div>
+        <div class="product-info">
+            <div class="product-category">${p.cat}</div>
+            <h3 class="product-title line-clamp-2">${p.title}</h3>
+            <p class="text-sm text-slate-500">Stok: ${p.stock} | Terjual: ${p.sold}</p>
+    <div class="product-footer">
+        <span class="product-price">${formatRupiah(p.price)}</span>
+        <div class="flex items-center gap-1">
+            ${renderStars(p.rating)}
+            <span class="text-xs text-slate-500">(${p.rating})</span>
+        </div>
+    </div>
+        </div>
+                </div>
+            `).join('');
+
+            // reveal newly added items
+            revealOnScroll();
+        }
+
+        function renderAdmin() {
+            if(!DB.session || DB.session.role !== 'admin') { renderHome(); return; }
+
+            app.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 class="text-3xl font-bold font-heading">Admin Dashboard</h1>
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium" onclick="alert('Feature not implemented in standalone demo')">
+                            <i class="ph ph-plus"></i> Add Product
+                        </button>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl border shadow-sm dark:bg-slate-800">
+                            <h3 class="text-slate-500 text-sm font-medium mb-1">Total Products</h3>
+                            <p class="text-3xl font-bold font-heading text-slate-800 dark:text-slate-100">${DB.products.length}</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border shadow-sm dark:bg-slate-800">
+                            <h3 class="text-slate-500 text-sm font-medium mb-1">Inventory Value</h3>
+                            <p class="text-3xl font-bold font-heading text-primary">${formatRupiah(DB.products.reduce((a,b)=>a+(b.price*b.stock),0))}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border shadow-sm overflow-hidden dark:bg-slate-800">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-600 font-heading border-b dark:bg-slate-700 dark:text-slate-200">
+                                <tr>
+                                    <th class="p-4">Product</th>
+                                    <th class="p-4">Price</th>
+                                    <th class="p-4">Stock</th>
+                                    <th class="p-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                ${DB.products.map(p => `
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                                        <td class="p-4 flex items-center gap-3">
+                                            <img src="${p.img}" class="w-10 h-10 rounded object-cover bg-slate-200">
+                                            <span class="font-medium">${p.title}</span>
+                                        </td>
+                                        <td class="p-4">${formatRupiah(p.price)}</td>
+                                        <td class="p-4">${p.stock}</td>
+                                        <td class="p-4 text-right">
+                                            <button onclick="alert('Delete simulated')" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="ph ph-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAbout() {
+            app.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold font-heading mb-4">Tentang Kami</h1>
+                        <p class="text-lg text-slate-600 dark:text-slate-300">Selamat datang di Marz Pedia, toko online terpercaya untuk semua kebutuhan Anda.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg">
+                            <h2 class="text-2xl font-bold font-heading mb-4">Visi Kami</h2>
+                            <p class="text-slate-600 dark:text-slate-300">Menjadi platform e-commerce terdepan yang menghubungkan konsumen dengan produk berkualitas tinggi dari seluruh Indonesia.</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg">
+                            <h2 class="text-2xl font-bold font-heading mb-4">Misi Kami</h2>
+                            <p class="text-slate-600 dark:text-slate-300">Menyediakan pengalaman belanja online yang aman, mudah, dan menyenangkan dengan harga kompetitif dan layanan pelanggan terbaik.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-primary to-teal-500 text-white p-8 rounded-2xl text-center">
+                        <h2 class="text-2xl font-bold font-heading mb-4">Mengapa Memilih Kami?</h2>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div>
+                                <div class="text-4xl mb-2">🚚</div>
+                                <h3 class="font-bold mb-2">Pengiriman Cepat</h3>
+                                <p class="text-sm">Pengiriman ke seluruh Indonesia dengan waktu yang terjamin.</p>
+                            </div>
+                            <div>
+                                <div class="text-4xl mb-2">💳</div>
+                                <h3 class="font-bold mb-2">Pembayaran Aman</h3>
+                                <p class="text-sm">Berbagai metode pembayaran yang aman dan terpercaya.</p>
+                            </div>
+                            <div>
+                                <div class="text-4xl mb-2">⭐</div>
+                                <h3 class="font-bold mb-2">Kualitas Terjamin</h3>
+                                <p class="text-sm">Semua produk kami telah melalui proses seleksi ketat.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            revealOnScroll();
+        }
+
+        function renderContact() {
+            app.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold font-heading mb-4">Kontak Kami</h1>
+                        <p class="text-lg text-slate-600 dark:text-slate-300">Hubungi kami untuk pertanyaan, saran, atau dukungan pelanggan.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg">
+                            <h2 class="text-2xl font-bold font-heading mb-6">Informasi Kontak</h2>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                        <i class="ph ph-map-pin text-primary text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold">Alamat</h3>
+                                        <p class="text-slate-600 dark:text-slate-300">Jl. Contoh No. 123, Jakarta, Indonesia</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                        <i class="ph ph-phone text-primary text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold">Telepon</h3>
+                                        <p class="text-slate-600 dark:text-slate-300">+62 812-3456-7890</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                        <i class="ph ph-envelope text-primary text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold">Email</h3>
+                                        <p class="text-slate-600 dark:text-slate-300">info@marzpedia.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg">
+                            <h2 class="text-2xl font-bold font-heading mb-6">Kirim Pesan</h2>
+                            <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama</label>
+                                    <input type="text" id="contactName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none dark:bg-slate-700 dark:border-slate-600" placeholder="Nama Anda" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+                                    <input type="email" id="contactEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none dark:bg-slate-700 dark:border-slate-600" placeholder="email@contoh.com" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pesan</label>
+                                    <textarea id="contactMessage" rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none dark:bg-slate-700 dark:border-slate-600" placeholder="Tulis pesan Anda..." required></textarea>
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-teal-600 transition-colors shadow-lg shadow-teal-500/20">
+                                    Kirim Pesan
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            revealOnScroll();
+        }
+
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const message = document.getElementById('contactMessage').value;
+
+            // Simulate form submission
+            showToast(`Terima kasih ${name}! Pesan Anda telah dikirim.`);
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactEmail').value = '';
+            document.getElementById('contactMessage').value = '';
+        }
+
+        function renderCartCount() {
+            const qty = DB.cart.reduce((a,b)=>a+b.qty,0);
+            const badge = document.getElementById('cartBadge');
+            badge.innerText = qty;
+            badge.style.opacity = qty > 0 ? '1' : '0';
+        }
+
+        function renderCartDrawer() {
+            const container = document.getElementById('cartItems');
+            const totalEl = document.getElementById('cartTotal');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const discountEl = document.getElementById('cartDiscount');
+            const discountRow = document.getElementById('discountRow');
+
+            if(DB.cart.length === 0) {
+                container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500"><i class="ph ph-shopping-cart text-4xl mb-2"></i><p>Cart is empty</p></div>`;
+                subtotalEl.innerText = formatRupiah(0);
+                discountRow.style.display = 'none';
+                totalEl.innerText = formatRupiah(0);
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = DB.cart.map(item => {
+                total += item.price * item.qty;
+                return `
+                    <div class="flex gap-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-700">
+                        <img src="${item.img}" class="w-20 h-20 object-cover rounded-lg bg-slate-100 dark:bg-slate-600">
+                        <div class="flex-1 flex flex-col justify-center">
+                            <h4 class="font-medium line-clamp-1 dark:text-slate-100">${item.title}</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-2">${formatRupiah(item.price)}</p>
+                            <div class="flex items-center gap-3">
+                                <button onclick="DB.updateQty('${item.id}', -1)" class="w-6 h-6 rounded border flex items-center justify-center hover:bg-slate-200 dark:border-slate-500 dark:hover:bg-slate-600"><i class="ph ph-minus text-xs text-white dark:text-black"></i></button>
+                                <span class="text-sm font-medium w-4 text-center dark:text-slate-300">${item.qty}</span>
+                                <button onclick="DB.updateQty('${item.id}', 1)" class="w-6 h-6 rounded border flex items-center justify-center hover:bg-slate-200 dark:border-slate-500 dark:hover:bg-slate-600"><i class="ph ph-plus text-xs text-white dark:text-black"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            subtotalEl.innerText = formatRupiah(total);
+            let discountAmount = total * DB.discount;
+            let finalTotal = total - discountAmount;
+            if (DB.discount > 0) {
+                discountRow.style.display = 'flex';
+                discountEl.innerText = `-${formatRupiah(discountAmount)}`;
+            } else {
+                discountRow.style.display = 'none';
+            }
+            totalEl.innerText = formatRupiah(finalTotal);
+        }
+
+        function openDrawer() {
+            drawer.classList.remove('hidden');
+            renderCartDrawer();
+            setTimeout(() => {
+                document.getElementById('drawerContent').classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawerContent').classList.add('translate-x-full');
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+            }, 300);
+        }
+
+        function renderAuth() {
+            const area = document.getElementById('authArea');
+            if(DB.session) {
+                area.innerHTML = `
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-100 rounded-full transition-colors">
+                            <div class="w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold text-sm">
+                                ${DB.session.name.charAt(0)}
+                            </div>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border py-1 hidden group-hover:block dark:bg-slate-800">
+                            <div class="px-4 py-2 border-b dark:border-slate-700">
+                                <p class="font-medium text-sm">${DB.session.name}</p>
+                                <p class="text-xs text-slate-500 capitalize">${DB.session.role}</p>
+                            </div>
+                            ${DB.session.role === 'admin' ? `<a href="#admin" onclick="renderAdmin()" class="block px-4 py-2 text-sm hover:bg-slate-50 text-primary">Admin Dashboard</a>` : ''}
+                            <a href="#" onclick="renderHome()" class="block px-4 py-2 text-sm hover:bg-slate-50">Home</a>
+                            <button onclick="DB.logout()" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50">Logout</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `
+                    <button onclick="openAuth()" class="px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-100 transition-colors">
+                        Login
+                    </button>
+                `;
+            }
+        }
+
+        function openAuth() {
+            document.getElementById('authModal').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('authContent').classList.remove('opacity-0', 'scale-95');
+            }, 10);
+        }
+
+        function closeAuth() {
+            document.getElementById('authContent').classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                document.getElementById('authModal').classList.add('hidden');
+            }, 200);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            if(DB.login(u, p)) {
+                closeAuth();
+                showToast(`Welcome back, ${DB.session.name}!`);
+            } else {
+                alert('Invalid! Try admin/admin');
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => {
+                t.classList.remove('show');
+            }, 3000);
+        }
+
+        function openEventModal() {
+            document.getElementById('eventModal').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('eventContent').classList.remove('opacity-0', 'scale-95');
+            }, 10);
+            showGameSelection();
+        }
+
+        function closeEventModal() {
+            document.getElementById('eventContent').classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                document.getElementById('eventModal').classList.add('hidden');
+            }, 200);
+        }
+
+        function showGameSelection() {
+            document.getElementById('gameSelection').classList.remove('hidden');
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('winMessage').classList.add('hidden');
+            document.getElementById('loseMessage').classList.add('hidden');
+        }
+
+        function selectGame(gameType) {
+            document.getElementById('gameSelection').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            if (gameType === 'number') {
+                startNumberGame();
+            } else if (gameType === 'rps') {
+                startRPSGame();
+            } else if (gameType === 'math') {
+                startMathGame();
+            } else if (gameType === 'riddle') {
+                startRiddleGame();
+            }
+        }
+
+        // Number Guessing Game
+        let targetNumber;
+        let attempts = 3;
+
+        function startNumberGame() {
+            targetNumber = Math.floor(Math.random() * 10) + 1;
+            attempts = 3;
+            document.getElementById('gameArea').innerHTML = `
+                <input type="number" id="guessInput" min="1" max="10" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none mb-4 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" placeholder="Masukkan angka">
+                <button onclick="makeGuess()" class="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">Tebak</button>
+                <p id="attemptsLeft" class="text-center mt-2 dark:text-slate-300">Kesempatan tersisa: 3</p>
+            `;
+        }
+
+        function makeGuess() {
+            const guess = parseInt(document.getElementById('guessInput').value);
+            if (isNaN(guess) || guess < 1 || guess > 10) {
+                alert('Masukkan angka antara 1-10');
+                return;
+            }
+            attempts--;
+            if (guess === targetNumber) {
+                // Win
+                DB.discount = 0.2; // 20%
+                document.getElementById('gameArea').classList.add('hidden');
+                document.getElementById('winMessage').classList.remove('hidden');
+                showToast('Selamat! Anda mendapatkan diskon 20%');
+                renderCartDrawer(); // Update cart
+            } else if (attempts === 0) {
+                // Lose
+                document.getElementById('gameArea').classList.add('hidden');
+                document.getElementById('loseMessage').classList.remove('hidden');
+            } else {
+                document.getElementById('attemptsLeft').innerText = `Kesempatan tersisa: ${attempts}`;
+                if (guess < targetNumber) {
+                    showToast('Terlalu kecil!');
+                } else {
+                    showToast('Terlalu besar!');
+                }
+            }
+        }
+
+        // Rock Paper Scissors Game
+        let playerScore = 0;
+        let computerScore = 0;
+        let rounds = 0;
+
+        function startRPSGame() {
+            playerScore = 0;
+            computerScore = 0;
+            rounds = 0;
+            document.getElementById('gameArea').innerHTML = `
+                <div class="text-center">
+                    <p class="mb-4 dark:text-slate-300">Pilih salah satu (Best of 3):</p>
+                    <div class="flex justify-center gap-4 mb-4">
+                        <button onclick="playRPS('rock')" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-teal-600 transition-colors">🪨 Batu</button>
+                        <button onclick="playRPS('paper')" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-teal-600 transition-colors">📄 Kertas</button>
+                        <button onclick="playRPS('scissors')" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-teal-600 transition-colors">✂️ Gunting</button>
+                    </div>
+                    <p id="rpsResult" class="mb-2 dark:text-slate-300"></p>
+                    <p id="rpsScore" class="dark:text-slate-300">Skor: Anda 0 - Komputer 0</p>
+                </div>
+            `;
+        }
+
+        function playRPS(choice) {
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+            rounds++;
+            let result = '';
+
+            if (choice === computerChoice) {
+                result = `Seri! Anda memilih ${choice}, komputer memilih ${computerChoice}`;
+            } else if (
+                (choice === 'rock' && computerChoice === 'scissors') ||
+                (choice === 'paper' && computerChoice === 'rock') ||
+                (choice === 'scissors' && computerChoice === 'paper')
+            ) {
+                playerScore++;
+                result = `Menang! Anda memilih ${choice}, komputer memilih ${computerChoice}`;
+            } else {
+                computerScore++;
+                result = `Kalah! Anda memilih ${choice}, komputer memilih ${computerChoice}`;
+            }
+
+            document.getElementById('rpsResult').innerText = result;
+            document.getElementById('rpsScore').innerText = `Skor: Anda ${playerScore} - Komputer ${computerScore}`;
+
+            if (rounds >= 3) {
+                setTimeout(() => {
+                    if (playerScore > computerScore) {
+                        // Win
+                        DB.discount = 0.2; // 20%
+                        document.getElementById('gameArea').classList.add('hidden');
+                        document.getElementById('winMessage').classList.remove('hidden');
+                        showToast('Selamat! Anda mendapatkan diskon 20%');
+                        renderCartDrawer(); // Update cart
+                    } else {
+                        // Lose
+                        document.getElementById('gameArea').classList.add('hidden');
+                        document.getElementById('loseMessage').classList.remove('hidden');
+                    }
+                }, 1000);
+            }
+        }
+
+        // Math Quiz Game
+        let correctAnswer;
+        let mathAttempts = 3;
+
+        function startMathGame() {
+            mathAttempts = 3;
+            document.getElementById('gameArea').innerHTML = `
+                <div class="text-center">
+                    <p id="mathQuestion" class="mb-4 text-lg font-bold"></p>
+                    <input type="number" id="mathInput" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none mb-4 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" placeholder="Jawaban">
+                    <button onclick="checkMathAnswer()" class="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">Jawab</button>
+                    <p id="mathAttemptsLeft" class="text-center mt-2">Kesempatan tersisa: 3</p>
+                </div>
+            `;
+            generateMathQuestion();
+        }
+
+        function generateMathQuestion() {
+            const operations = ['+', '-', '*'];
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            let num1, num2;
+            if (op === '*') {
+                num1 = Math.floor(Math.random() * 50) + 1;
+                num2 = Math.floor(Math.random() * 50) + 1;
+            } else {
+                num1 = Math.floor(Math.random() * 20) + 1;
+                num2 = Math.floor(Math.random() * 20) + 1;
+            }
+            let question = `${num1} ${op} ${num2}`;
+            if (op === '+') correctAnswer = num1 + num2;
+            else if (op === '-') correctAnswer = num1 - num2;
+            else correctAnswer = num1 * num2;
+            document.getElementById('mathQuestion').innerText = `Berapa ${question}?`;
+        }
+
+        function checkMathAnswer() {
+            const answer = parseInt(document.getElementById('mathInput').value);
+            if (isNaN(answer)) {
+                alert('Masukkan angka');
+                return;
+            }
+            mathAttempts--;
+            if (answer === correctAnswer) {
+                // Win
+                DB.discount = 0.2; // 20%
+                document.getElementById('gameArea').classList.add('hidden');
+                document.getElementById('winMessage').classList.remove('hidden');
+                showToast('Selamat! Anda mendapatkan diskon 20%');
+                renderCartDrawer(); // Update cart
+            } else if (mathAttempts === 0) {
+                // Lose
+                document.getElementById('gameArea').classList.add('hidden');
+                document.getElementById('loseMessage').classList.remove('hidden');
+            } else {
+                document.getElementById('mathAttemptsLeft').innerText = `Kesempatan tersisa: ${mathAttempts}`;
+                showToast('Salah! Coba lagi.');
+                document.getElementById('mathInput').value = '';
+            }
+        }
+
+        // Riddle Game
+        let riddleAttempts = 3;
+        const riddles = [
+            { question: "Apa yang bisa berjalan tapi tidak punya kaki?", answer: "jam" },
+            { question: "Apa yang semakin basah semakin kering?", answer: "handuk" },
+            { question: "Apa yang punya kepala tapi tidak bisa berpikir?", answer: "bawang" },
+            { question: "Apa yang selalu datang tapi tidak pernah tiba?", answer: "besok" },
+            { question: "Apa yang bisa dipegang tapi tidak bisa disentuh?", answer: "kata" }
+        ];
+
+        function startRiddleGame() {
+            riddleAttempts = 3;
+            const riddle = riddles[Math.floor(Math.random() * riddles.length)];
+            document.getElementById('gameArea').innerHTML = `
+                <div class="text-center">
+                    <p class="mb-4 text-lg font-bold dark:text-slate-100">${riddle.question}</p>
+                    <input type="text" id="riddleInput" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none mb-4 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" placeholder="Jawaban">
+                    <button onclick="checkRiddleAnswer('${riddle.answer}')" class="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-teal-600 transition-colors">Jawab</button>
+                    <p id="riddleAttemptsLeft" class="text-center mt-2 dark:text-slate-300">Kesempatan tersisa: 3</p>
+                </div>
+            `;
+        }
+
+        function checkRiddleAnswer(correctAnswer) {
+            const answer = document.getElementById('riddleInput').value.toLowerCase().trim();
+            if (answer === '') {
+                alert('Masukkan jawaban');
+                return;
+            }
+            riddleAttempts--;
+            if (answer === correctAnswer) {
+                // Win
+                DB.discount = 0.2; // 20%
+                document.getElementById('gameArea').classList.add('hidden');
+                document.getElementById('winMessage').classList.remove('hidden');
+                showToast('Selamat! Anda mendapatkan diskon 20%');
+                renderCartDrawer(); // Update cart
+            } else if (riddleAttempts === 0) {
+                // Lose
+                document.getElementById('gameArea').classList.add('hidden');
+                document.getElementById('loseMessage').classList.remove('hidden');
+            } else {
+                document.getElementById('riddleAttemptsLeft').innerText = `Kesempatan tersisa: ${riddleAttempts}`;
+                showToast('Salah! Coba lagi.');
+                document.getElementById('riddleInput').value = '';
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function openProductModal(productId) {
+            const product = DB.products.find(p => p.id === productId);
+            if (!product) return;
+            const content = document.getElementById('productDetailContent');
+            content.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <img src="${product.img}" class="w-full h-64 object-cover rounded-lg" alt="${product.title}">
+                    </div>
+                    <div>
+                        <div class="mb-4">
+                            <div class="text-sm text-slate-500 dark:text-slate-400 mb-1">${product.cat}</div>
+                            <h2 class="text-2xl font-bold font-heading mb-2 dark:text-slate-100">${product.title}</h2>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex items-center gap-1">
+                                    ${renderStars(product.rating).replace('text-sm', 'text-lg')}
+                                </div>
+                                <span class="text-2xl font-bold text-yellow-500">${product.rating}</span>
+                                <span class="text-sm text-slate-500">(${product.sold} reviews)</span>
+                            </div>
+                            <p class="text-3xl font-bold text-primary mb-4">${formatRupiah(product.price)}</p>
+                            <div class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                                <p><strong>Stok:</strong> ${product.stock}</p>
+                                <p><strong>Terjual:</strong> ${product.sold}</p>
+                            </div>
+                        </div>
+                        <button onclick="DB.addToCart('${product.id}'); closeProductModal()" class="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-teal-600 transition-colors shadow-lg shadow-teal-500/20">
+                            Tambah ke Keranjang
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('productModal').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('productContent').classList.remove('opacity-0', 'scale-95');
+            }, 10);
+        }
+
+        function closeProductModal() {
+            document.getElementById('productContent').classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                document.getElementById('productModal').classList.add('hidden');
+            }, 200);
+        }
+
+
+
+
+
+        // reveal on scroll (simple)
+        function revealOnScroll(){
+            const els = document.querySelectorAll('.reveal');
+            const obs = new IntersectionObserver((entries)=>{
+                entries.forEach(ent => { if(ent.isIntersecting) ent.target.classList.add('show'); });
+            },{threshold:0.12});
+            els.forEach(el => obs.observe(el));
+        }
+
+        // slider logic (enhanced)
+        const images = [
+          {src: "https://asset-2.tribunnews.com/makassar/foto/bank/originals/ilustrasi-diskon-50-persen.jpg", title: 'Diskon Besar', desc: 'Hemat sampai 50% untuk produk pilihan.'},
+          {src: "https://shopee.co.id/inspirasi-shopee/wp-content/uploads/2021/08/hp-flagship-murah-1280x720.webp", title: 'Gadget Terbaik', desc: 'Pilihan smartphone dengan harga bersaing.'},
+          {src: "https://kontenesia.com/wp-content/uploads/2018/02/Promosi-Kaos-Oversize-min.jpg", title: 'Fashion Hits', desc: 'Kaos & hoodie nyaman untuk semua.'},
+          {src: "https://asset.tribunnews.com/1CNPywzWFqbC8kvMoqswK9OWkJ4=/1200x675/filters:upscale():quality(30):format(webp):focal(0.5x0.5:0.5x0.5)/jambi/foto/bank/originals/15042017-jam-tangan_20170415_215504.jpg", title: 'Aksesoris Keren', desc: 'Jam tangan dan tas trendi.'}
+        ];
+        let current = 0;
+        const slider = document.getElementById('slider');
+        const sliderTitle = document.getElementById('sliderTitle');
+        const sliderDesc = document.getElementById('sliderDesc');
+        const sliderDots = document.getElementById('sliderDots');
+        let autoplay = true;
+        let autoplayTimer;
+
+        // build dots
+        images.forEach((it, idx) => {
+          const d = document.createElement('div');
+          d.className = 'slider-dot' + (idx===0? ' active':'');
+          d.onclick = () => { current = idx; showSlide(current); resetAutoplay(); };
+          sliderDots.appendChild(d);
+        });
+
+        function showSlide(idx) {
+          const item = images[idx];
+          slider.style.opacity = '0';
+          setTimeout(() => {
+            slider.src = item.src || item;
+            slider.style.opacity = '1';
+            sliderTitle.innerText = item.title || '';
+            sliderDesc.innerText = item.desc || '';
+            Array.from(sliderDots.children).forEach((d,i)=> d.classList.toggle('active', i===idx));
+          }, 300);
+        }
+
+        function nextSlide() { current = (current + 1) % images.length; showSlide(current); }
+        function prevSlide() { current = (current - 1 + images.length) % images.length; showSlide(current); }
+
+        function startAutoplay() { autoplayTimer = setInterval(nextSlide, 4200); }
+        function stopAutoplay() { clearInterval(autoplayTimer); }
+        function resetAutoplay() { stopAutoplay(); if(autoplay) startAutoplay(); }
+
+        // Pause on hover
+        document.getElementById('sliderContainer').addEventListener('mouseenter', () => { stopAutoplay(); });
+        document.getElementById('sliderContainer').addEventListener('mouseleave', () => { if(autoplay) startAutoplay(); });
+
+        // keyboard navigation
+        document.addEventListener('keydown', (e) => {
+          if(e.key === 'ArrowLeft') prevSlide();
+          if(e.key === 'ArrowRight') nextSlide();
+        });
+
+        startAutoplay();
+
+        // initial render
+        renderAuth();
+        renderCartCount();
+
+        // watch hash
+        window.onhashchange = () => {
+            if(window.location.hash === '#admin') renderAdmin();
+            else renderHome();
+        };
+        if(window.location.hash === '#admin') renderAdmin();
+        else renderHome();
+    </script>
+</body>
+</html>
